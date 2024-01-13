@@ -10,7 +10,8 @@ import CoreLocation
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let manager = CLLocationManager()
-    @Published var location: CLLocation?
+    @Published var location: CLLocationCoordinate2D?
+    @Published var isLoading: Bool = false
     
     override init() {
         super.init()
@@ -18,13 +19,15 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     
     func requestLocation() {
-        manager.requestWhenInUseAuthorization()
+        isLoading = true
+        manager.requestLocation()
         manager.startUpdatingLocation()
     }
     
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-        self.location = location
+        self.location = location.coordinate
+        self.isLoading = false
         manager.stopUpdatingLocation()
     }
     
